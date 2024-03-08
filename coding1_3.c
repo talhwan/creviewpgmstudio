@@ -17,8 +17,8 @@ int inputScore(Student *s){
     for(i=0;i<3;i++){
         printf("%s score : ", title[i]);
         scanf("%d", &s->score[i]);
-        sum = sum + s->score[i];
-        //sum += s->score[i];
+        //sum = sum + s->score[i];
+        sum += s->score[i];
     }
     return sum;
 }
