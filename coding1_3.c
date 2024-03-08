@@ -1,22 +1,24 @@
 #include <stdio.h>
 
+// í•™ìƒ ì •ë³´ë¥¼ ë‹´ì•„ì¤„ êµ¬ì¡°ì²´ ì„ ì–¸
 typedef struct _student {
-    char name[20];
-    int score[3];
+    char name[20]; //ì´ë¦„
+    int score[3]; //ì„±ì  3ê°œ
 } Student;
 
-//ÇÕ°è¸¦ ¸®ÅÏÇÏ°í ÇÐ»ý 1¸í Æ÷ÀÎÅÍ º¯¼ö
+// ì´ì ì„ ê³„ì‚°í•´ ì£¼ëŠ” í•¨ìˆ˜ ì„ ì–¸
 int inputScore(Student *s){
-    char title[][20] = {"±¹¾î", "¿µ¾î", "¼öÇÐ"};
+    char title[][20] = {"Kor", "Eng", "Math"};
     int sum = 0, i = 0;
 
-    printf("ÇÐ»ýÀÇ ÀÌ¸§ ÀÔ·Â : ");
+    printf("Name : ");
     scanf("%s", s->name);
 
     for(i=0;i<3;i++){
-        printf("%s Á¡¼ö ÀÔ·Â : ", title[i]);
+        printf("%s score : ", title[i]);
         scanf("%d", &s->score[i]);
-        sum += s->score[i];
+        sum = sum + s->score[i];
+        //sum += s->score[i];
     }
     return sum;
 }
@@ -30,6 +32,6 @@ int main(void)
     sum = inputScore(&s1);
     avg = sum / 3.0; 
 
-    printf("%s ÇÐ»ýÀÇ ÃÑÁ¡ :  %d , Æò±ÕÀº %.2f", s1.name, sum, avg);
+    printf("%s total score :  %d , avg : %.2f", s1.name, sum, avg);
     return 0;
 }
