@@ -37,6 +37,5 @@ int main(void){
                 break;
             }
         }  
-
     } 
 }

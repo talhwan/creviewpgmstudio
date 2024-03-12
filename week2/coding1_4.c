@@ -21,7 +21,7 @@ int selectMenu(){
     return menu;
 }
 
-int addScore(Student *s){
+int createScore(Student *s){
     char title[][20] = {"Kor", "Eng", "Math"};
     int i = 0;
     
@@ -68,19 +68,19 @@ int updateScore(Student *s){
         printf("%s score : ", title[i]);
         scanf("%d", &s->score[i]);
     }
-    //printf("Student Data Updated!");
+    printf("Student Data Updated!\n");
     return 1;
 }
 
 
 int deleteScore(Student *s){
     int i=0;
-    strcpy_s(s->snum, 20, ""); //이전에 정의된 문자배열을 초기화 하는 과정
-    strcpy_s(s->name, 20, "");
+    //strcpy_s(s->snum, 20, ""); //이전에 정의된 문자배열을 초기화 하는 과정
+    //strcpy_s(s->name, 20, "");
     for(i=0;i<3;i++){
         s->score[i] = -1;
     }
-    printf("Student Score Deleted!");
+    printf("Student Score Deleted!\n");
     return 1;
 }
 
@@ -88,26 +88,26 @@ int main(void)
 {
     Student s;
     int result = 0, count = 0, menu = 0;
-    /*
-    
-    
-    result = addScore(&s);
+
+    result = createScore(&s);
     if(result > 0){
         readScore(s);
     }
 
     result = updateScore(&s);
     if(result > 0){
-        printf("Student Data Updated!\n");
+        //printf("Student Data Updated!\n");
         readScore(s);
     }
 
     result = deleteScore(&s);
     if(result > 0){
-        printf("Student Score Deleted!\n");
+        //printf("Student Score Deleted!\n");
         readScore(s);
     }
     return 0;
+    /*    
+    
     */
     /*
     while(1){
@@ -127,7 +127,7 @@ int main(void)
         if(menu == 1){
             readScore(s);
         } else if(menu == 2) {
-            result = addScore(&s);
+            result = createScore(&s);
             if(result > 0){
                 count = 1;
             }

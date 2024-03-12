@@ -135,7 +135,7 @@ int main(void){
             //조회, 수정, 삭제
             if(count == 0) {
                 //자료가 없을때는 입력만 가능!
-                printf("no data!!\n");
+                printf("no!!\n");
                 continue;
             }
         }
