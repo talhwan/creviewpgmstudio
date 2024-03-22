@@ -138,8 +138,10 @@ int selectMenu(){
     printf("2. 학생 추가\n");
     printf("3. 학생 수정\n");
     printf("4. 학생 삭제\n");
+    /*
     printf("5. 저장\n");
     printf("6. 불러오기\n");
+    */
     printf("7. 학생 검색(이름)\n");
     printf("8. 충전하기\n");
     printf("9. 사용하기\n");
@@ -171,8 +173,6 @@ int beforeCreateStudent(Student *s[], int count){
     
     printf("Student Num : ");
     scanf("%s", search);
-    //scanf("%s", s_each->name);
-    //printf("Student %s", s_each->name);
     
     while(1){
         //break;
@@ -188,15 +188,6 @@ int beforeCreateStudent(Student *s[], int count){
     return 1;
 }
 int createStudent(Student *s, char search[20]){
-
-    /*
-    printf("Student Num : ");
-    scanf("%s", s->snum);
-    */
-    //s->snum = search;
-    //s->snum = "112233";
-    
-    //strcpy(*s->snum,"112233");
     strcpy_s(s->snum, 20, search);
 
     printf("Student Name : ");
@@ -273,6 +264,10 @@ int main(void)
     int index = 0; //입력할 데이터 번호
     int temp_t = 0;
 
+    //일단 불러오기
+    count = loadStudent(splist);
+    index = count;
+
     while(1){
         menu = selectMenu();
         if(menu == 0) {
@@ -298,6 +293,7 @@ int main(void)
             if(result > 0){
                 count += 1;
                 index++;
+                saveStudent(splist, index);
             }
         } else if(menu == 3) {
             int no = selectStudentByNo(splist, index);
@@ -305,7 +301,10 @@ int main(void)
             printf("=> 취소됨!\n");
             continue;
             }
-            updateStudent(splist[no-1]);
+            result = updateStudent(splist[no-1]);
+            if(result > 0){
+                saveStudent(splist, index);
+            }
         } else if(menu == 4) {
             int no = selectStudentByNo(splist, index);
             if(no == 0){
@@ -320,6 +319,7 @@ int main(void)
                 splist[no-1] = NULL;
 
                 count--;
+                saveStudent(splist, index);
             }
         } else if(menu == 5) {
             saveStudent(splist, index);
