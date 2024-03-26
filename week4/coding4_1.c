@@ -51,6 +51,17 @@ c. 사용
 - 배열에 변동사항이 생겼을때 파일에도 저장해주세요.
 
 */
+//===============
+typedef struct _input {
+    int no;
+    int amount;
+} Input;
+typedef struct _expend {
+    int no;
+    int amount;
+} Expend;
+
+//==========
 
 // 학생 정보를 담아줄 구조체 선언
 typedef struct _student {
@@ -75,6 +86,7 @@ void saveStudent(Student *s[], int count){
     fclose(fp);
     printf("=> 저장됨! ");
 }
+
 int loadStudent(Student *s[]){
     int count = 0, i = 0;
     FILE *fp;
@@ -170,17 +182,17 @@ int createStudentBackup(Student *s){
 int beforeCreateStudent(Student *s[], int count){
     int result_int = 0;
     char search[20];
-    
-    printf("Student Num : ");
-    scanf("%s", search);
-    
+        
     while(1){
+        printf("Student Num : ");
+        scanf("%s", search);
+
         //break;
         result_int = searchStudentBySnum(s, count, search);
         if(result_int == -1){
             break;
         } else {
-            printf("already exist! please input again.");
+            printf("already exist! please input again.\n");
         }
     }
     
@@ -258,15 +270,16 @@ int deleteStudent(Student *s){
 
 int main(void)
 {
-    Student s;
     Student *splist[100];
     int result = 0, count = 0, menu = 0;
     int index = 0; //입력할 데이터 번호
     int temp_t = 0;
 
     //일단 불러오기
+    /*
     count = loadStudent(splist);
     index = count;
+    */
 
     while(1){
         menu = selectMenu();
@@ -293,7 +306,7 @@ int main(void)
             if(result > 0){
                 count += 1;
                 index++;
-                saveStudent(splist, index);
+                //saveStudent(splist, index);
             }
         } else if(menu == 3) {
             int no = selectStudentByNo(splist, index);
@@ -303,7 +316,7 @@ int main(void)
             }
             result = updateStudent(splist[no-1]);
             if(result > 0){
-                saveStudent(splist, index);
+                //saveStudent(splist, index);
             }
         } else if(menu == 4) {
             int no = selectStudentByNo(splist, index);
@@ -317,9 +330,8 @@ int main(void)
                 //삭제처리
                 if(splist[no-1]) free(splist[no-1]);
                 splist[no-1] = NULL;
-
                 count--;
-                saveStudent(splist, index);
+                //saveStudent(splist, index);
             }
         } else if(menu == 5) {
             saveStudent(splist, index);
