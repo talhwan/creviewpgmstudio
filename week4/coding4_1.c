@@ -46,22 +46,15 @@ c. 사용
 구조체 내용은 이후 확대기능에 따라 일부 변동 될 수도 있습니다.
 각 구조체 배열은 파일에 각각 저장하고 / 불러올 수 있습니다.
 
-바뀐 조건1
+추가 조건1
 - 처음 프로그램을 시작했을때, 파일에 있는 모든 정보를 불러와서 배열에 저장해주세요.
 - 배열에 변동사항이 생겼을때 파일에도 저장해주세요.
 
+추가 조건2
+- 학생 정보를 추가하는 경우 학번이 중복되었을 때, 다시 학번을 입력하게 해주세요.
+
 */
 //===============
-typedef struct _input {
-    int no;
-    int amount;
-} Input;
-typedef struct _expend {
-    int no;
-    int amount;
-} Expend;
-
-//==========
 
 // 학생 정보를 담아줄 구조체 선언
 typedef struct _student {
@@ -70,8 +63,63 @@ typedef struct _student {
     char phone[20]; // 연락처
     int t_input; // 충전 횟수
     int t_expend; // 사용 횟수
-    int balance // 잔액
+    int balance; // 잔액
 } Student;
+// 입금 
+typedef struct _input {
+    int no;
+    int amount;
+} Input;
+// 출금
+typedef struct _expend {
+    int no;
+    int amount;
+} Expend;
+int beforeCreateInput(Student *s[], int student_count, Input *p);
+
+//===============
+
+int beforeCreateInput(Student *s[], int student_count, Input *p){
+
+    int result_int = -1;
+    char search[20];
+    printf("Student Num : ");
+    scanf("%s", search);
+
+    result_int = searchStudentBySnum(s, student_count, search);
+    printf("Student No = %d \n", result_int);
+    if(result_int == -1){
+        printf("no data.\n");
+        return 0;
+    } else {
+        result_int = createInput(p, result_int);
+    }
+    return result_int;
+
+}
+int createInput(Input *p, int no){
+    //printf("No : ");
+    //scanf("%d", p->no);
+    p->no = no;
+
+    printf("Amount : ");
+    scanf("%d", p->amount);
+    return 1;
+}
+void saveInput(Input *p[], int count){
+    FILE *fp;
+    fp = fopen("input.txt", "wt");
+    int i=0;
+    for(i=0;i<count;i++){
+        if(p[i] == NULL) continue;
+        fprintf(fp, "%d %d\n"
+        ,p[i]->no,p[i]->amount);
+    }
+    fclose(fp);
+    printf("=> 저장됨! ");
+}
+
+//===============
 
 void saveStudent(Student *s[], int count){
     FILE *fp;
@@ -91,6 +139,10 @@ int loadStudent(Student *s[]){
     int count = 0, i = 0;
     FILE *fp;
     fp = fopen("student.txt", "rt");
+    if(fp == NULL){ 
+        printf("파일이 존재하지 않아..미안해!! 하지만 너가 저장 잘 해주면 생성 되지롱!!\n");
+        return 0; 
+    }
     for(i=0; i < 100; i++){
         fscanf(fp, "%s", s[i]->snum);
         if(feof(fp)) break;
@@ -132,8 +184,6 @@ int searchStudentBySnum(Student *s[], int count, char search[20]){
     for(int i =0; i <count ; i++){
         if(s[i] == NULL) continue;
         if(strstr(s[i]->name, search)){
-            printf("%2d | ", i+1);
-            readStudent(*s[i]);
             result_order = i;
         }
     }
@@ -154,9 +204,12 @@ int selectMenu(){
     printf("5. 저장\n");
     printf("6. 불러오기\n");
     */
+    printf("5. 저장\n");
+    printf("6. 불러오기\n");
+
     printf("7. 학생 검색(이름)\n");
-    printf("8. 충전하기\n");
-    printf("9. 사용하기\n");
+    printf("101. 충전하기\n");
+    printf("102. 사용하기\n");
     printf("0. 종료\n\n");
     printf("=> 원하는 메뉴는? ");
     scanf("%d", &menu);
@@ -187,7 +240,6 @@ int beforeCreateStudent(Student *s[], int count){
         printf("Student Num : ");
         scanf("%s", search);
 
-        //break;
         result_int = searchStudentBySnum(s, count, search);
         if(result_int == -1){
             break;
@@ -196,8 +248,8 @@ int beforeCreateStudent(Student *s[], int count){
         }
     }
     
-    createStudent(s[count], search);
-    return 1;
+    result_int = createStudent(s[count], search);
+    return result_int;
 }
 int createStudent(Student *s, char search[20]){
     strcpy_s(s->snum, 20, search);
@@ -270,16 +322,24 @@ int deleteStudent(Student *s){
 
 int main(void)
 {
+    //공용
+    int menu = 0, result = 0;
+
+    //학생
     Student *splist[100];
-    int result = 0, count = 0, menu = 0;
-    int index = 0; //입력할 데이터 번호
-    int temp_t = 0;
+    int student_count[2] = {0,0}; //count, index
+
+    //
+    Input *iplist[100];
+    int input_count[2] = {0,0}; //count, index
 
     //일단 불러오기
     /*
     count = loadStudent(splist);
     index = count;
     */
+    student_count[0] = loadStudent(splist);
+    student_count[1] = student_count[0];
 
     while(1){
         menu = selectMenu();
@@ -289,37 +349,34 @@ int main(void)
         }
         if(menu == 1 || menu ==3 || menu == 4) {
             //조회, 수정, 삭제
-            if(count == 0) {
+            if(student_count[0] == 0) {
                 //자료가 없을때는 입력만 가능!
                 continue;
             }
         }
         
         if(menu == 1){
-            //readScore(s);
-            listStudent(splist, index);
+            listStudent(splist, student_count[1]);
         } else if(menu == 2) {
-            splist[index] = (Student *)malloc(sizeof(Student));
-            result = beforeCreateStudent(splist, index);
-            
-            //result = createStudent(splist[index]);
+            splist[student_count[1]] = (Student *)malloc(sizeof(Student));
+            result = beforeCreateStudent(splist, student_count[1]);
             if(result > 0){
-                count += 1;
-                index++;
-                //saveStudent(splist, index);
+                student_count[0] += 1;
+                student_count[1]++;
+                saveStudent(splist, student_count[1]);
             }
         } else if(menu == 3) {
-            int no = selectStudentByNo(splist, index);
+            int no = selectStudentByNo(splist, student_count[1]);
             if(no == 0){
             printf("=> 취소됨!\n");
             continue;
             }
             result = updateStudent(splist[no-1]);
             if(result > 0){
-                //saveStudent(splist, index);
+                saveStudent(splist, student_count[1]);
             }
         } else if(menu == 4) {
-            int no = selectStudentByNo(splist, index);
+            int no = selectStudentByNo(splist, student_count[1]);
             if(no == 0){
             printf("=> 취소됨!\n");
             continue;
@@ -330,20 +387,33 @@ int main(void)
                 //삭제처리
                 if(splist[no-1]) free(splist[no-1]);
                 splist[no-1] = NULL;
-                count--;
-                //saveStudent(splist, index);
+                student_count[0]--;
+                saveStudent(splist, student_count[1]);
             }
         } else if(menu == 5) {
-            saveStudent(splist, index);
-        } else if(menu == 6) {
-            count = loadStudent(splist);
-            //printf(">>>>%d\n", temp_t);
-            //count = loadData(splist);
-            //index = count;
-            index = count;
+            //
+            saveStudent(splist, student_count[1]);
         } else if(menu == 7) {
-            searchStudentByName(splist, index);        
+            searchStudentByName(splist, student_count[1]);   
+        } else if(menu == 101) {
+            //입금하기
+            result = beforeCreateInput(splist, student_count[1], iplist[input_count[1]]);  
+            if(result > 0){
+                input_count[0] += 1;
+                input_count[1]++;
+                saveInput(iplist, input_count[1]);
+            }           
         }
     }
     return 0;
 }
+
+
+
+/*
+        } else if(menu == 5) {
+            saveStudent(splist, student_count[1]);
+        } else if(menu == 6) {
+            student_count[0] = loadStudent(splist);
+            student_count[1] = student_count[0];
+        */
