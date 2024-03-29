@@ -53,6 +53,7 @@ c. 사용
 추가 조건2
 - 학생 정보를 추가하는 경우 학번이 중복되었을 때, 다시 학번을 입력하게 해주세요.
 
+
 */
 //===============
 
@@ -70,14 +71,16 @@ typedef struct _input {
     int snumno;
     int amount;
 } Input;
+/*
 // 출금
 typedef struct _expend {
     int snumno;
     int amount;
 } Expend;
+*/
 
 int beforeCreateInput(Student *s[], int student_count, Input *p);
-int createInput(Input *p, int snumno);
+int createInput(Input *p, int result_int, Student *s[]);
 void saveInput(Input *p[], int count);
 void printInputContext();
 void readInput(Input s);
@@ -112,14 +115,20 @@ int beforeCreateInput(Student *s[], int student_count, Input *p){
             break;
         }
     }
-    result_int = createInput(p, result_int);
+    result_int = createInput(p, result_int, s);
     return result_int;
 
 }
-int createInput(Input *p, int result_int){
+int createInput(Input *p, int result_int, Student *s[]){
+
+    //readStudent(*s[result_int]);
     p->snumno = result_int;
     printf("Amount : ");
     scanf("%d", &p->amount);
+
+    s[result_int]->t_input = s[result_int]->t_input + 1;
+    s[result_int]->balance = s[result_int]->balance + p->amount;
+
     return 1;
 }
 void saveInput(Input *p[], int count){
@@ -170,16 +179,19 @@ void saveStudent(Student *s[], int count){
     printf("=> 저장됨! ");
 }
 int loadStudent(Student *s[]){
-    int count = 0, i = 0;
+    int i = 0;
     FILE *fp;
     fp = fopen("student.txt", "rt");
     if(fp == NULL){ 
-        printf("파일이 존재하지 않아..미안해!! 하지만 너가 저장 잘 해주면 생성 될꺼야!!\n");
+        printf("파일이 존재하지 않아..미안해!!\n");
         return 0; 
     }
     for(i=0; i < 100; i++){
+        //printf("%d!0000:\n", i);
         fscanf(fp, "%s", s[i]->snum);
+        //printf("%d!00i00:\n", i);
         if(feof(fp)) break;
+        //printf("%d!00ii00:\n", i);
         fscanf(fp, "%s", s[i]->name);
         fscanf(fp, "%s", s[i]->phone);
         fscanf(fp, "%d", &s[i]->t_input);
