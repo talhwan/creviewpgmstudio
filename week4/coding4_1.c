@@ -71,13 +71,11 @@ typedef struct _input {
     int snumno;
     int amount;
 } Input;
-/*
 // 출금
 typedef struct _expend {
     int snumno;
     int amount;
 } Expend;
-*/
 
 int beforeCreateInput(Student *s[], int student_count, Input *p);
 int createInput(Input *p, int result_int, Student *s[]);
@@ -85,6 +83,13 @@ void saveInput(Input *p[], int count);
 void printInputContext();
 void readInput(Input s);
 void listInput(Input *s[], int count);
+
+int beforeCreateExpend(Student *s[], int student_count, Expend *p);
+int createExpend(Expend *p, int result_int, Student *s[]);
+void saveExpend(Expend *p[], int count);
+void printExpendContext();
+void readExpend(Expend s);
+void listExpend(Expend *s[], int count);
 
 void saveStudent(Student *s[], int count);
 int loadStudent(Student *s[]);
@@ -163,6 +168,69 @@ void listInput(Input *s[], int count){
     }
 }
 
+//===============
+int beforeCreateExpend(Student *s[], int student_count, Expend *p){
+    int result_int = 0;
+    char search[20];
+
+    while(1){
+        printf("Student Num : ");
+        scanf("%s", search);
+
+        result_int = searchStudentBySnum(s, student_count, search);
+        if(result_int == -1){
+            printf("no data.\n");
+        } else {
+            break;
+        }
+    }
+    result_int = createExpend(p, result_int, s);
+    return result_int;
+
+}
+int createExpend(Expend *p, int result_int, Student *s[]){
+
+    //readStudent(*s[result_int]);
+    p->snumno = result_int;
+    printf("Amount : ");
+    scanf("%d", &p->amount);
+
+    s[result_int]->t_expend = s[result_int]->t_expend + 1;
+    s[result_int]->balance = s[result_int]->balance - p->amount;
+
+    return 1;
+}
+void saveExpend(Expend *p[], int count){
+    FILE *fp;
+    fp = fopen("expend.txt", "wt");
+//
+    int i=0;
+    for(i=0;i<count;i++){
+        if(p[i] == NULL) continue;
+        fprintf(fp, "%d %d\n"
+        ,p[i]->snumno, p[i]->amount);
+    }
+    fclose(fp);
+    printf("=> 저장됨! ");
+}
+void printExpendContext(){
+    printf("%10s | %10s |\n",
+        "No", "Amount"
+    );
+}
+void readExpend(Expend s){
+    printf("%10d | %10d |\n",
+        s.snumno, s.amount
+    );
+}
+void listExpend(Expend *s[], int count){
+    printExpendContext();
+    int i=0;
+    for(i=0;i<count;i++){
+        if(s[i] == NULL) continue;
+        readExpend(*s[i]);
+    }
+}
 //===============
 
 void saveStudent(Student *s[], int count){
@@ -258,6 +326,11 @@ int selectMenu(){
     printf("110. 충전 내역 조회\n");
     printf("120. 충전하기\n");
     printf("150. 충전내역 저장\n");
+
+    
+    printf("210. 사용 내역 조회\n");
+    printf("220. 사용하기\n");
+    printf("250. 사용내역 저장\n");
     
     //printf("102. 사용하기\n");
 
@@ -367,6 +440,9 @@ int main(void)
     //입금
     Input *iplist[100];
     int input_count[2] = {0,0}; //count, index
+    //출금
+    Expend *eplist[100];
+    int expend_count[2] = {0,0}; //count, index
 
     //일단 불러오기
     /*
@@ -446,6 +522,23 @@ int main(void)
             } 
         } else if(menu == 150) {
             saveInput(iplist, input_count[1]);
+
+        } else if(menu == 210) {
+            listExpend(iplist, expend_count[1]);
+        } else if(menu == 220) {
+            //출금하기
+            eplist[expend_count[1]] = (Expend *)malloc(sizeof(Expend));
+
+            result = beforeCreateExpend(splist, student_count[1], eplist[expend_count[1]]);
+            if(result > 0){
+                expend_count[0] += 1;
+                expend_count[1]++;
+                //saveExpend(iplist, expend_count[1]);
+            } 
+        } else if(menu == 250) {
+            saveExpend(eplist, expend_count[1]);
+
+
         }
     }
     return 0;
